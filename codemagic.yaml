@@ -27,22 +27,23 @@ workflows:
           touch .env
           echo "GEMINI_API_KEY=AIzaSyDummyKeyForCompilation12345" > local.properties
           
-          # Keystore dosyasını dış dizinden veya içeriden bulup hem kök dizine hem app klasörüne kopyalayalım
+          # Keystore dosyasını ana dizinden alıp her iki kritik konuma da kopyalayalım
           if [ -f "$CM_BUILD_DIR/release.keystore" ]; then
             cp "$CM_BUILD_DIR/release.keystore" /Users/builder/clone/1253/debug.keystore
             cp "$CM_BUILD_DIR/release.keystore" /Users/builder/clone/1253/app/debug.keystore
             cp "$CM_BUILD_DIR/release.keystore" /Users/builder/clone/1253/release.keystore
-          elif [ -f "release.keystore" ]; then
-            cp release.keystore /Users/builder/clone/1253/debug.keystore
-            cp release.keystore /Users/builder/clone/1253/app/debug.keystore
+          elif [ -f "../release.keystore" ]; then
+            cp ../release.keystore /Users/builder/clone/1253/debug.keystore
+            cp ../release.keystore /Users/builder/clone/1253/app/debug.keystore
+            cp ../release.keystore /Users/builder/clone/1253/release.keystore
           else
-            # Hiçbiri yoksa sıfırdan üretelim
+            # Dosya bulunamazsa güvenli bir debug keystore üretelim
             keytool -genkey -v -keystore /Users/builder/clone/1253/debug.keystore -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -storepass 12531253 -keypass 12531253
             cp /Users/builder/clone/1253/debug.keystore /Users/builder/clone/1253/app/debug.keystore
             cp /Users/builder/clone/1253/debug.keystore /Users/builder/clone/1253/release.keystore
           fi
           
-          # Dosyaların gerçekten orada olduğunu loglarda görelim
+          # Dosyaların varlığını loglarda doğrulayalım
           ls -la /Users/builder/clone/1253/debug.keystore
           ls -la /Users/builder/clone/1253/app/debug.keystore
           
@@ -60,8 +61,8 @@ workflows:
           echo "keyAlias=androiddebugkey" >> app/key.properties
           echo "storeFile=/Users/builder/clone/1253/debug.keystore" >> app/key.properties
           
-          # Yetki verip build alalım
+          # Yetki verip, önbelleği temizleyerek build alalım
           chmod +x gradlew
-          ./gradlew bundleRelease
+          ./gradlew clean bundleRelease --no-configuration-cache
     artifacts:
       - "**/app/build/outputs/bundle/release/app-release.aab"
