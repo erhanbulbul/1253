@@ -8,8 +8,8 @@ workflows:
     scripts:
       - name: Build Android App Bundle
         script: |
-          # Doğru dizine geçelim
-          cd $(find . -maxdepth 2 -name "settings.gradle.kts" -o -name "settings.gradle" -exec dirname {} \; | head -n 1)
+          # Codemagic'in projeyi indirdiği ana dizine kesin olarak zıplayalım
+          cd $CM_BUILD_DIR/1253
           
           # key.properties dosyasını oluşturalım
           mkdir -p app
@@ -19,7 +19,7 @@ workflows:
           echo "keyAlias=my-key-alias" >> app/key.properties
           echo "storeFile=../release.keystore" >> app/key.properties
           
-          # Sistem gradle kullanarak direkt build alalım
+          # Sistem gradle ile build alalım
           gradle bundleRelease
     artifacts:
       - "**/app/build/outputs/bundle/release/app-release.aab"
