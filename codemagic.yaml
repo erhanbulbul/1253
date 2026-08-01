@@ -6,12 +6,11 @@ workflows:
       groups:
         - google_play
     scripts:
-      - name: Build Android App Bundle
+      - name: Prepare Environment and Generate Files
         script: |
-          # Proje klasörüne geçelim
           cd $CM_BUILD_DIR/1253
           
-          # Gradle wrapper jar ve properties ayarları
+          # 1. Gradle Wrapper Sürüm Sabitleme
           mkdir -p gradle/wrapper
           rm -f gradle/wrapper/gradle-wrapper.jar
           curl -L -o gradle/wrapper/gradle-wrapper.jar https://raw.githubusercontent.com/gradle/gradle/v8.14.0/gradle/wrapper/gradle-wrapper.jar
@@ -22,12 +21,11 @@ workflows:
           echo "zipStoreBase=GRADLE_USER_HOME" >> gradle/wrapper/gradle-wrapper.properties
           echo "zipStorePath=wrapper/dists" >> gradle/wrapper/gradle-wrapper.properties
           
-          # Çevre değişkeni dosyaları
-          touch .env.example
-          touch .env
+          # 2. Local Properties ve Çevre Değişkenleri
           echo "GEMINI_API_KEY=AIzaSyDummyKeyForCompilation12345" > local.properties
+          touch .env
           
-          # GeminiLegacyService.kt'nin aradığı GEMINI_API_KEY sabitini oluşturalım
+          # 3. Kotlin Derleme Hatası İçin Sabit Tanımı (GeminiLegacyService için)
           mkdir -p app/src/main/java/com/example/data/remote
           cat << 'EOF' > app/src/main/java/com/example/data/remote/GeminiConfig.kt
           package com.example.data.remote
@@ -35,34 +33,29 @@ workflows:
           const val GEMINI_API_KEY = "AIzaSyDummyKeyForCompilation12345"
           EOF
           
-          # Eski keystore dosyalarını tamamen temizleyelim
-          rm -f /Users/builder/clone/1253/debug.keystore /Users/builder/clone/1253/app/debug.keystore
-          
-          # -noprompt parametresiyle interaktif takılmaları önleyerek kesin olarak keystore üretelim
+          # 4. Keystore Dosyasını Kesin Olarak Üret ve Doğrula
+          rm -f /Users/builder/clone/1253/debug.keystore
           keytool -genkey -v -keystore /Users/builder/clone/1253/debug.keystore -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -storepass 12531253 -keypass 12531253 -noprompt
           
-          # Kopyasını app klasörüne de atalım
-          cp /Users/builder/clone/1253/debug.keystore /Users/builder/clone/1253/app/debug.keystore
-          
-          # Dosyaların gerçekten orada olduğunu loglarda doğrulayalım
+          # Dosyanın varlığını loglarda görelim
           ls -la /Users/builder/clone/1253/debug.keystore
-          ls -la /Users/builder/clone/1253/app/debug.keystore
           
-          # key.properties dosyalarını oluşturalım
-          rm -f key.properties app/key.properties
-          
+          # 5. key.properties Dosyalarını Mutlak Yollarla Oluştur
           echo "storePassword=12531253" > key.properties
           echo "keyPassword=12531253" >> key.properties
           echo "keyAlias=androiddebugkey" >> key.properties
           echo "storeFile=/Users/builder/clone/1253/debug.keystore" >> key.properties
           
+          mkdir -p app
           echo "storePassword=12531253" > app/key.properties
           echo "keyPassword=12531253" >> app/key.properties
           echo "keyAlias=androiddebugkey" >> app/key.properties
-          echo "storeFile=/Users/builder/clone/1253/app/debug.keystore" >> app/key.properties
+          echo "storeFile=/Users/builder/clone/1253/debug.keystore" >> app/key.properties
           
-          # Yetki verip build alalım
+      - name: Build Android App Bundle
+        script: |
+          cd $CM_BUILD_DIR/1253
           chmod +x gradlew
-          ./gradlew bundleRelease --no-configuration-cache
+          ./gradlew bundleRelease --no-daemon --no-configuration-cache
     artifacts:
       - "**/app/build/outputs/bundle/release/app-release.aab"
