@@ -8,6 +8,7 @@ workflows:
     scripts:
       - name: Create key.properties
         script: |
+          mkdir -p app
           rm -f app/key.properties
           echo "storePassword=12531253" > app/key.properties
           echo "keyPassword=12531253" >> app/key.properties
