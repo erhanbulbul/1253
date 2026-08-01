@@ -8,8 +8,16 @@ workflows:
     scripts:
       - name: Build Android App Bundle
         script: |
-          # Codemagic'in projeyi indirdiği ana dizine kesin olarak zıplayalım
+          # Doğru dizine geçelim
           cd $CM_BUILD_DIR/1253
+          
+          # Gradle wrapper versiyonunu AGP 9.1.1 ile uyumlu olan 9.3.1'e güncelleyelim
+          mkdir -p gradle/wrapper
+          echo "distributionBase=GRADLE_USER_HOME" > gradle/wrapper/gradle-wrapper.properties
+          echo "distributionPath=wrapper/dists" >> gradle/wrapper/gradle-wrapper.properties
+          echo "distributionUrl=https\://services.gradle.org/distributions/gradle-9.3.1-bin.zip" >> gradle/wrapper/gradle-wrapper.properties
+          echo "zipStoreBase=GRADLE_USER_HOME" >> gradle/wrapper/gradle-wrapper.properties
+          echo "zipStorePath=wrapper/dists" >> gradle/wrapper/gradle-wrapper.properties
           
           # key.properties dosyasını oluşturalım
           mkdir -p app
@@ -19,7 +27,8 @@ workflows:
           echo "keyAlias=my-key-alias" >> app/key.properties
           echo "storeFile=../release.keystore" >> app/key.properties
           
-          # Sistem gradle ile build alalım
-          gradle bundleRelease
+          # Wrapper'a yetki verip kendi gradlew'u ile build alalım
+          chmod +x gradlew
+          ./gradlew bundleRelease
     artifacts:
       - "**/app/build/outputs/bundle/release/app-release.aab"
