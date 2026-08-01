@@ -8,10 +8,10 @@ workflows:
     scripts:
       - name: Build Android App Bundle
         script: |
-          # 1. Ana dizinde olduğumuzdan emin olalım
-          cd $CM_BUILD_DIR
+          # Proje dosyalarının olduğu doğru klasörü bulup içine girelim
+          cd $(find . -maxdepth 2 -name "gradlew" -exec dirname {} \; | head -n 1)
           
-          # 2. key.properties dosyasını doğru yere oluşturalım
+          # Bulunduğumuz yerde key.properties dosyasını oluşturalım
           mkdir -p app
           rm -f app/key.properties
           echo "storePassword=12531253" > app/key.properties
@@ -19,8 +19,8 @@ workflows:
           echo "keyAlias=my-key-alias" >> app/key.properties
           echo "storeFile=../release.keystore" >> app/key.properties
           
-          # 3. gradlew için yetki verelim ve build alalım
+          # Yetkiyi verip build alalım
           chmod +x gradlew
           ./gradlew bundleRelease
     artifacts:
-      - app/build/outputs/bundle/release/app-release.aab
+      - "**/app/build/outputs/bundle/release/app-release.aab"
