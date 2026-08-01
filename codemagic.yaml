@@ -8,19 +8,17 @@ workflows:
     scripts:
       - name: Create key.properties
         script: |
+          cd app
           rm -f key.properties
           echo "storePassword=12531253" > key.properties
           echo "keyPassword=12531253" >> key.properties
           echo "keyAlias=my-key-alias" >> key.properties
           echo "storeFile=release.keystore" >> key.properties
-        working_directory: android
       - name: Grant execute permission for gradlew
         script: |
           chmod +x gradlew
-        working_directory: android
       - name: Build Android AAB
         script: |
           ./gradlew bundleRelease
-        working_directory: android
     artifacts:
-      - android/app/build/outputs/bundle/release/app-release.aab
+      - app/build/outputs/bundle/release/app-release.aab
