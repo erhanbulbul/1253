@@ -11,7 +11,7 @@ workflows:
           # Doğru dizine geçelim
           cd $CM_BUILD_DIR/1253
           
-          # Bozuk jar dosyasını tertemiz ve çalışır bir gradle-wrapper.jar ile değiştirelim
+          # Bozuk jar dosyasını tertemiz gradle-wrapper.jar ile değiştirelim
           mkdir -p gradle/wrapper
           rm -f gradle/wrapper/gradle-wrapper.jar
           curl -L -o gradle/wrapper/gradle-wrapper.jar https://raw.githubusercontent.com/gradle/gradle/v8.14.0/gradle/wrapper/gradle-wrapper.jar
@@ -22,6 +22,10 @@ workflows:
           echo "distributionUrl=https\://services.gradle.org/distributions/gradle-9.3.1-bin.zip" >> gradle/wrapper/gradle-wrapper.properties
           echo "zipStoreBase=GRADLE_USER_HOME" >> gradle/wrapper/gradle-wrapper.properties
           echo "zipStorePath=wrapper/dists" >> gradle/wrapper/gradle-wrapper.properties
+          
+          # Eksik olan .env.example dosyasını oluşturalım
+          touch .env.example
+          touch .env
           
           # key.properties dosyasını oluşturalım
           mkdir -p app
