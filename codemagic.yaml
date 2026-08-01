@@ -8,10 +8,14 @@ workflows:
     scripts:
       - name: Build Android App Bundle
         script: |
-          # Proje dosyalarının olduğu doğru klasörü bulup içine girelim
+          # Doğru dizine geçelim
           cd $(find . -maxdepth 2 -name "gradlew" -exec dirname {} \; | head -n 1)
           
-          # Bulunduğumuz yerde key.properties dosyasını oluşturalım
+          # Bozuk/eksik gradle-wrapper.jar dosyasını resmi kaynaktan tekrar indirelim
+          mkdir -p gradle/wrapper
+          curl -L -o gradle/wrapper/gradle-wrapper.jar https://github.com/gradle/gradle/raw/v8.5.0/gradle/wrapper/gradle-wrapper.jar
+          
+          # key.properties dosyasını oluşturalım
           mkdir -p app
           rm -f app/key.properties
           echo "storePassword=12531253" > app/key.properties
