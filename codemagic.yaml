@@ -8,10 +8,7 @@ workflows:
     scripts:
       - name: Build Android App Bundle
         script: |
-          # Ana dizindeki release.keystore dosyasını proje klasörüne kopyalayalım
-          cp $CM_BUILD_DIR/release.keystore $CM_BUILD_DIR/1253/ 2>/dev/null || true
-          
-          # Şimdi proje klasörüne geçelim
+          # Proje klasörüne geçelim
           cd $CM_BUILD_DIR/1253
           
           # Gradle wrapper jar ve properties ayarları
@@ -29,30 +26,26 @@ workflows:
           touch .env.example
           touch .env
           
-          # Kotlin derlemesi için GEMINI_API_KEY tanımlamasını local.properties içine ekleyelim
+          # Kotlin derlemesi için GEMINI_API_KEY tanımlaması
           echo "GEMINI_API_KEY=AIzaSyDummyKeyForCompilation12345" > local.properties
           
-          # Keystore dosyalarını garantiye alalım (debug.keystore ve release.keystore eksiksiz olsun)
-          if [ -f "release.keystore" ]; then
-            cp release.keystore debug.keystore
-          else
-            keytool -genkey -v -keystore debug.keystore -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -storepass 12531253 -keypass 12531253 || true
-            cp debug.keystore release.keystore || true
-          fi
+          # Kesin olarak mutlak yolda debug.keystore oluşturalım
+          rm -f /Users/builder/clone/1253/debug.keystore
+          keytool -genkey -v -keystore /Users/builder/clone/1253/debug.keystore -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -storepass 12531253 -keypass 12531253
           
-          # key.properties dosyalarını oluşturalım
+          # key.properties dosyalarını mutlak dosya yolu ile oluşturalım
           rm -f key.properties app/key.properties
           
           echo "storePassword=12531253" > key.properties
           echo "keyPassword=12531253" >> key.properties
-          echo "keyAlias=my-key-alias" >> key.properties
-          echo "storeFile=debug.keystore" >> key.properties
+          echo "keyAlias=androiddebugkey" >> key.properties
+          echo "storeFile=/Users/builder/clone/1253/debug.keystore" >> key.properties
           
           mkdir -p app
           echo "storePassword=12531253" > app/key.properties
           echo "keyPassword=12531253" >> app/key.properties
-          echo "keyAlias=my-key-alias" >> app/key.properties
-          echo "storeFile=../debug.keystore" >> app/key.properties
+          echo "keyAlias=androiddebugkey" >> app/key.properties
+          echo "storeFile=/Users/builder/clone/1253/debug.keystore" >> app/key.properties
           
           # Yetki verip build alalım
           chmod +x gradlew
