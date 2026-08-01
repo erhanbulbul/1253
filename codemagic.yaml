@@ -8,12 +8,11 @@ workflows:
     scripts:
       - name: Create key.properties
         script: |
-          cd app
-          rm -f key.properties
-          echo "storePassword=12531253" > key.properties
-          echo "keyPassword=12531253" >> key.properties
-          echo "keyAlias=my-key-alias" >> key.properties
-          echo "storeFile=release.keystore" >> key.properties
+          rm -f app/key.properties
+          echo "storePassword=12531253" > app/key.properties
+          echo "keyPassword=12531253" >> app/key.properties
+          echo "keyAlias=my-key-alias" >> app/key.properties
+          echo "storeFile=../release.keystore" >> app/key.properties
       - name: Grant execute permission for gradlew
         script: |
           chmod +x gradlew
