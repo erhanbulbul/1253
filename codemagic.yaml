@@ -26,16 +26,19 @@ workflows:
           touch .env.example
           touch .env
           
-          # key.properties dosyasını hem kök dizine hem de app/ dizinine garanti olması için yazalım
+          # İmza dosyası kontrolü: Gradle'ın aradığı debug.keystore'u release.keystore ile eşitleyelim
+          if [ -f "release.keystore" ]; then
+            cp release.keystore debug.keystore
+          fi
+          
+          # key.properties dosyalarını garantiye alalım
           rm -f key.properties app/key.properties
           
-          # Kök dizin için key.properties
           echo "storePassword=12531253" > key.properties
           echo "keyPassword=12531253" >> key.properties
           echo "keyAlias=my-key-alias" >> key.properties
           echo "storeFile=release.keystore" >> key.properties
           
-          # App dizini için key.properties
           mkdir -p app
           echo "storePassword=12531253" > app/key.properties
           echo "keyPassword=12531253" >> app/key.properties
