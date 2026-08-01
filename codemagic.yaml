@@ -9,11 +9,7 @@ workflows:
       - name: Build Android App Bundle
         script: |
           # Doğru dizine geçelim
-          cd $(find . -maxdepth 2 -name "gradlew" -exec dirname {} \; | head -n 1)
-          
-          # Bozuk/eksik gradle-wrapper.jar dosyasını resmi kaynaktan tekrar indirelim
-          mkdir -p gradle/wrapper
-          curl -L -o gradle/wrapper/gradle-wrapper.jar https://github.com/gradle/gradle/raw/v8.5.0/gradle/wrapper/gradle-wrapper.jar
+          cd $(find . -maxdepth 2 -name "settings.gradle.kts" -o -name "settings.gradle" -exec dirname {} \; | head -n 1)
           
           # key.properties dosyasını oluşturalım
           mkdir -p app
@@ -23,8 +19,7 @@ workflows:
           echo "keyAlias=my-key-alias" >> app/key.properties
           echo "storeFile=../release.keystore" >> app/key.properties
           
-          # Yetkiyi verip build alalım
-          chmod +x gradlew
-          ./gradlew bundleRelease
+          # Sistem gradle kullanarak direkt build alalım
+          gradle bundleRelease
     artifacts:
       - "**/app/build/outputs/bundle/release/app-release.aab"
