@@ -8,8 +8,8 @@ workflows:
     scripts:
       - name: Create key.properties
         script: |
-          echo "storePassword=SENIN_KEYSTORE_SIFREN" > key.properties
-          echo "keyPassword=SENIN_KEY_SIFREN" >> key.properties
+          echo "storePassword=12531253" > key.properties
+          echo "keyPassword=12531253" >> key.properties
           echo "keyAlias=my-key-alias" >> key.properties
           echo "storeFile=release.keystore" >> key.properties
         working_directory: android
