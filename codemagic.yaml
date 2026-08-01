@@ -11,25 +11,32 @@ workflows:
           # Doğru dizine geçelim
           cd $CM_BUILD_DIR/1253
           
-          # Bozuk jar dosyasını tertemiz gradle-wrapper.jar ile değiştirelim
+          # Gradle wrapper jar ve properties ayarları
           mkdir -p gradle/wrapper
           rm -f gradle/wrapper/gradle-wrapper.jar
           curl -L -o gradle/wrapper/gradle-wrapper.jar https://raw.githubusercontent.com/gradle/gradle/v8.14.0/gradle/wrapper/gradle-wrapper.jar
           
-          # Gradle wrapper properties dosyasını 9.3.1'e güncelleyelim
           echo "distributionBase=GRADLE_USER_HOME" > gradle/wrapper/gradle-wrapper.properties
           echo "distributionPath=wrapper/dists" >> gradle/wrapper/gradle-wrapper.properties
           echo "distributionUrl=https\://services.gradle.org/distributions/gradle-9.3.1-bin.zip" >> gradle/wrapper/gradle-wrapper.properties
           echo "zipStoreBase=GRADLE_USER_HOME" >> gradle/wrapper/gradle-wrapper.properties
           echo "zipStorePath=wrapper/dists" >> gradle/wrapper/gradle-wrapper.properties
           
-          # Eksik olan .env.example dosyasını oluşturalım
+          # Çevre değişkeni dosyaları
           touch .env.example
           touch .env
           
-          # key.properties dosyasını oluşturalım
+          # key.properties dosyasını hem kök dizine hem de app/ dizinine garanti olması için yazalım
+          rm -f key.properties app/key.properties
+          
+          # Kök dizin için key.properties
+          echo "storePassword=12531253" > key.properties
+          echo "keyPassword=12531253" >> key.properties
+          echo "keyAlias=my-key-alias" >> key.properties
+          echo "storeFile=release.keystore" >> key.properties
+          
+          # App dizini için key.properties
           mkdir -p app
-          rm -f app/key.properties
           echo "storePassword=12531253" > app/key.properties
           echo "keyPassword=12531253" >> app/key.properties
           echo "keyAlias=my-key-alias" >> app/key.properties
