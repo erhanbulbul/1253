@@ -3,14 +3,18 @@ workflows:
     name: Android Workflow
     max_build_duration: 60
     environment:
-      android_signing:
-        - keystore_reference
       groups:
         - google_play
     scripts:
-      - name: Grant execute permission to gradlew
+      - name: Grant execute permission for gradlew
         script: |
           chmod +x gradlew
+      - name: Create key.properties
+        script: |
+          echo "storePassword=SENIN_KEYSTORE_SIFREN" > android/key.properties
+          echo "keyPassword=SENIN_KEY_SIFREN" >> android/key.properties
+          echo "keyAlias=my-key-alias" >> android/key.properties
+          echo "storeFile=release.keystore" >> android/key.properties
       - name: Build Android AAB
         script: |
           ./gradlew bundleRelease
