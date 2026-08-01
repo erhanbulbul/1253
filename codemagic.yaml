@@ -6,17 +6,20 @@ workflows:
       groups:
         - google_play
     scripts:
+      - name: Create key.properties
+        script: |
+          echo "storePassword=SENIN_KEYSTORE_SIFREN" > key.properties
+          echo "keyPassword=SENIN_KEY_SIFREN" >> key.properties
+          echo "keyAlias=my-key-alias" >> key.properties
+          echo "storeFile=release.keystore" >> key.properties
+        working_directory: android
       - name: Grant execute permission for gradlew
         script: |
           chmod +x gradlew
-      - name: Create key.properties
-        script: |
-          echo "storePassword=SENIN_KEYSTORE_SIFREN" > android/key.properties
-          echo "keyPassword=SENIN_KEY_SIFREN" >> android/key.properties
-          echo "keyAlias=my-key-alias" >> android/key.properties
-          echo "storeFile=release.keystore" >> android/key.properties
+        working_directory: android
       - name: Build Android AAB
         script: |
           ./gradlew bundleRelease
+        working_directory: android
     artifacts:
       - android/app/build/outputs/bundle/release/app-release.aab
