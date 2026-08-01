@@ -22,18 +22,31 @@ workflows:
           echo "zipStoreBase=GRADLE_USER_HOME" >> gradle/wrapper/gradle-wrapper.properties
           echo "zipStorePath=wrapper/dists" >> gradle/wrapper/gradle-wrapper.properties
           
-          # Çevre değişkeni dosyaları
+          # Çevre değişkeni ve local.properties dosyaları
           touch .env.example
           touch .env
-          
-          # Kotlin derlemesi için GEMINI_API_KEY tanımlaması
           echo "GEMINI_API_KEY=AIzaSyDummyKeyForCompilation12345" > local.properties
           
-          # Kesin olarak mutlak yolda debug.keystore oluşturalım
-          rm -f /Users/builder/clone/1253/debug.keystore
-          keytool -genkey -v -keystore /Users/builder/clone/1253/debug.keystore -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -storepass 12531253 -keypass 12531253
+          # Keystore dosyasını dış dizinden veya içeriden bulup hem kök dizine hem app klasörüne kopyalayalım
+          if [ -f "$CM_BUILD_DIR/release.keystore" ]; then
+            cp "$CM_BUILD_DIR/release.keystore" /Users/builder/clone/1253/debug.keystore
+            cp "$CM_BUILD_DIR/release.keystore" /Users/builder/clone/1253/app/debug.keystore
+            cp "$CM_BUILD_DIR/release.keystore" /Users/builder/clone/1253/release.keystore
+          elif [ -f "release.keystore" ]; then
+            cp release.keystore /Users/builder/clone/1253/debug.keystore
+            cp release.keystore /Users/builder/clone/1253/app/debug.keystore
+          else
+            # Hiçbiri yoksa sıfırdan üretelim
+            keytool -genkey -v -keystore /Users/builder/clone/1253/debug.keystore -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -storepass 12531253 -keypass 12531253
+            cp /Users/builder/clone/1253/debug.keystore /Users/builder/clone/1253/app/debug.keystore
+            cp /Users/builder/clone/1253/debug.keystore /Users/builder/clone/1253/release.keystore
+          fi
           
-          # key.properties dosyalarını mutlak dosya yolu ile oluşturalım
+          # Dosyaların gerçekten orada olduğunu loglarda görelim
+          ls -la /Users/builder/clone/1253/debug.keystore
+          ls -la /Users/builder/clone/1253/app/debug.keystore
+          
+          # key.properties dosyalarını mutlak yollarla güncelleyelim
           rm -f key.properties app/key.properties
           
           echo "storePassword=12531253" > key.properties
