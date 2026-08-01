@@ -6,22 +6,21 @@ workflows:
       groups:
         - google_play
     scripts:
-      - name: Create key.properties
+      - name: Build Android App Bundle
         script: |
+          # 1. Ana dizinde olduğumuzdan emin olalım
+          cd $CM_BUILD_DIR
+          
+          # 2. key.properties dosyasını doğru yere oluşturalım
           mkdir -p app
           rm -f app/key.properties
           echo "storePassword=12531253" > app/key.properties
-          echo "keyPassword=12531253" >> key.properties
-          echo "keyAlias=my-key-alias" >> key.properties
-          echo "storeFile=../release.keystore" >> key.properties
-        working_directory: .
-      - name: Grant execute permission for gradlew
-        script: |
+          echo "keyPassword=12531253" >> app/key.properties
+          echo "keyAlias=my-key-alias" >> app/key.properties
+          echo "storeFile=../release.keystore" >> app/key.properties
+          
+          # 3. gradlew için yetki verelim ve build alalım
           chmod +x gradlew
-        working_directory: .
-      - name: Build Android AAB
-        script: |
           ./gradlew bundleRelease
-        working_directory: .
     artifacts:
       - app/build/outputs/bundle/release/app-release.aab
